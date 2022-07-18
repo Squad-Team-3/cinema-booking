@@ -13,7 +13,17 @@ app.use(cors())
 app.use(cookieParser())
 app.use(express.json())
 
-
+app.get("/onemovie", (req: Request, res: Response) => {
+  const sql = "SELECT * FROM onemovie where line=0 ;"
+  connection.query(sql, (err, results) => {
+    if (err) {
+      console.log(err)
+    }
+    else {
+      res.status(200).send(results)
+    }
+  })
+})
 // fetch all the movies
 app.get("/movies", (req: Request, res: Response) => {
   const sql = "SELECT * FROM MOVIES;"
@@ -23,6 +33,30 @@ app.get("/movies", (req: Request, res: Response) => {
     }
     else {
       res.status(200).send(results)
+    }
+  })
+})
+app.put("/movies",(req:Request,res:Response)=>{
+  console.log("im inside update")
+  //req.body should be the useraccount id ,and it will change the user movie foreign key with the movie id
+  console.log(req.body)
+  const sqlupdate =`UPDATE movies SET ?="reserved" where idmovie=? ;`
+  connection.query(sqlupdate,[req.body.data.chair,req.body.data.idmovie],function(error,results){
+    if(error){res.status(500).send(error);}
+    else{
+      res.send("updated onemovie succesfully")
+    }
+  })
+})
+app.put("/onemovie",(req:Request,res:Response)=>{
+  console.log("im inside update")
+  //req.body should be the useraccount id ,and it will change the user movie foreign key with the movie id
+  console.log(req.body)
+  const sqlupdate =`UPDATE onemovie SET idmovie =?, name=?, description=? ,time=?, imgurl=? ,categorie=? ,chair1=?,chair2=?,chair3=?,chair4=?,chair5=? WHERE line=0;`
+  connection.query(sqlupdate,[req.body.idmovie,req.body.name,req.body.description,req.body.time,req.body.imgurl,req.body.categorie,req.body.chair1,req.body.chair2,req.body.chair3,req.body.chair4,req.body.chair5],function(error,results){
+    if(error){res.status(500).send(error);}
+    else{
+      res.send("updated onemovie succesfully")
     }
   })
 })
@@ -41,6 +75,7 @@ app.post("/signup/user", (req: Request, res: Response) => {
       console.log(error)
     }
     else {
+      //pass variables that we want to store in the JWT token
       const token = JsonWebToken.sign({ username: results.username, email: results.email }, SECRET_JWT_CODE)
       res.status(201).send({ success: true, token: token })
     }
@@ -82,7 +117,10 @@ app.post("/login/user", (req: Request, res: Response) => {
         })
       }
       if (result) {
-        const token = JsonWebToken.sign({ username: data[0].username, idusers: data[0].idusers }, SECRET_JWT_CODE)
+        //pass variables that we want to store in the JWT token
+        const token = JsonWebToken.sign({ username: data[0].username, idusers: data[0].idusers }, SECRET_JWT_CODE, {
+          expiresIn: '7d'
+        })
         res.status(200).send({
           message: 'Logged in',
           token: token,
@@ -98,6 +136,41 @@ app.post("/login/user", (req: Request, res: Response) => {
   })
 })
 
+app.put("/api",(req:Request,res:Response)=>{
+  console.log("im inside update")
+  //req.body should be the useraccount id ,and it will change the user movie foreign key with the movie id
+  console.log(req.body)
+  const sqlupdate =`UPDATE users SET idmovie =${req.body.idmovie}  WHERE id=${req.body.iduser};`
+  connection.query(sqlupdate,function(error,results){
+    if(error){res.status(500).send(error);}
+    else{
+      res.send("User linked to a movie successfully")
+    }
+  })
+})
+app.get("/api/chairs", (req: Request, res: Response) => {
+  const sql = "SELECT * FROM chairs where chair_fk=?;"
+  connection.query(sql,req.body.data.idmovie, (err, results) => {
+    if (err) {
+      console.log(err)
+    }
+    else {
+      res.status(200).send(results)
+    }
+  })
+})
+app.put("/api/chair",(req:Request,res:Response)=>{
+  console.log("im inside update chair")
+  //req.body should be the useraccount id ,and it will change the user movie foreign key with the movie id
+  console.log(req.body)
+  const sqlupdate =`UPDATE chairs SET ${req.body.chair}=reserved  WHERE idmovie=${req.body.idmovie};`
+  connection.query(sqlupdate,function(error,results){
+    if(error){res.status(500).send(error);}
+    else{
+      res.send("chair updated successfully")
+    }
+  })
+})
 
 
 app.listen(port, () => {
