@@ -1,100 +1,129 @@
 <template>
-<div class="holder">
- <div class="Container"  v-for="movie in Movies" :key="movie.id">
-    <div  class="MovieContainer">
-       
-        <img :src="`${movie.imgurl}`"
-  alt="image"/>
-    <h2 class="MovieName">{{movie.name}}</h2>
-        <h2 class="Movietime">{{movie.time}}</h2>
-       
-       <v-btn class="watch"  @click="navigateTo({name: 'BookingPage'})"> Watch </v-btn> 
-    </div>
+  <div class="holder">
+    <div class="Container" v-for="movie in Movies" :key="movie.idmovie">
+      <div class="MovieContainer">
 
- </div>
-</div>
+        <img :src="`${movie.imgurl}`" alt="image" />
+        <div id="film-des">
+          <h2 class="MovieName">{{ movie.name }}</h2>
+          <h2 class="Movietime">{{ movie.time }}</h2>
+        </div>
+        <button class="watch" @click="navigateTo({ name: 'BookingPage' }); sendMovie(movie)"> Watch </button>
+      </div>
+
+    </div>
+  </div>
 </template>
 
+
 <script lang="ts">
- import { defineComponent } from 'vue';
-  import axios from 'axios'
+import { defineComponent } from 'vue';
+import axios from 'axios'
 export default defineComponent({
   name: 'AllCards',
   data() {
-  return {
-    Movies: []
-  }
-},
- methods: {
-        navigateTo (route:any) {
-            this.$router.push(route)
-        },
-        fetchData(){
-          axios.get("http://localhost:3000/movies").then(response=>{
-            this.Movies=response.data
-       console.log("Movies are fetched")
-      })
-        },
-        
-    },
-
-   mounted:function(){
-        this.fetchData() //method1 will execute at pageload
+    return {
+      Movies: [],
+    }
   },
- }
- );
+  methods: {
+    navigateTo(route: any) {
+      this.$router.push(route)
+    },
+    fetchData() {
+      axios.get("http://localhost:3000/movies").then(response => {
+        this.Movies = response.data
+        console.log("Movies are fetched")
+      })
+    },
+    sendMovie(movie: any) {
+      console.log(movie)
+      axios.put("http://localhost:3000/onemovie", movie).then(response => {
+        console.log("movie sended to backend");
+      })
+    }
+
+  },
+
+  mounted: function () {
+    this.fetchData() //method1 will execute at pageload
+  },
+}
+);
 </script>
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->
 <style scoped>
-.holder{
-  width: 70%;
-  margin-left: 250px;;
+* {
+  margin: 0;
+  padding: 0;
 }
-.Container{
-display:inline-block;
-margin-top:20px ;
-}
-.MovieContainer{
-    text-align: center;
-    display:inline-block;
-  
 
-  width: 280px;
+.holder {
+  width: 85%;
+  float: right;
+  margin-left: 100px;
+
+}
+
+.Container {
+  display: inline-block;
+}
+
+.MovieContainer {
+  text-align: center;
+  display: inline-block;
+  border: 5px solid rgb(190, 189, 189);
+  border-radius: 15px;
+  width: 300px;
+  padding: 20px;
   margin: 10px;
- 
+  height: 600px;
+  box-shadow: 1px 2px 10px 0px rgba(0, 0, 0, 0.3);
+  background: white;
+  /* Old browsers */
+}
 
-  box-shadow: 1px 2px 10px 0px rgba(0,0,0,0.3);
- background: white; /* Old browsers */
+.MovieContainer:hover {
+  border: 5px solid #FFC20E;
+  opacity: 80%;
 }
-img{
-    width:275px ;
-    height: 450px;
-    border: 2px solid grey  ;
-    
-    margin: 0px;
-    
+
+img {
+  width: 275px;
+  height: 450px;
+  border: 2px solid grey;
+  margin: 10px;
 }
-img:hover{
-    background-color: rgb(59, 59, 59);
-}
-.watch{
+
+.watch {
   width: 280px;
-  margin:0px;
+  margin-bottom: -50px;
   height: 60px;
-  background-color: yellow;
-  color:black;
-  
-  
+  padding: 10px 20px;
+  background-color: #FFC20E;
+  border-radius: 3px;
+  color: black;
+  color: white;
 }
-.MovieName{
+
+.watch:hover {
+  background-color: #95771f;
+  transition: 1s ease;
+}
+
+.MovieName {
   font-size: 15px;
   margin: 0px;
-  
 }
-.Movietime{
-font-size: 15px;
+
+.Movietime {
+  font-size: 15px;
   margin: -0px;
-  
+  opacity: 100%;
+}
+
+#film-des {
+  margin: 20px;
 }
 </style>
